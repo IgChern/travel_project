@@ -1,5 +1,4 @@
 from django.db import models
-from datetime import datetime, timedelta
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import (
     AbstractBaseUser,
@@ -58,10 +57,6 @@ class User(AbstractBaseUser):
         default=1900,
         blank=True,
     )
-
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["username", "email"]

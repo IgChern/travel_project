@@ -32,7 +32,7 @@ class Trips(models.Model):
         verbose_name_plural = "Trips"
 
     def __str__(self) -> str:
-        return self.title
+        return self.location
 
 
 class Post(models.Model):
