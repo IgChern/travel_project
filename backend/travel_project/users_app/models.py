@@ -6,6 +6,9 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.utils import timezone
+
+current_year = timezone.now().year
 
 
 # Create your models here.
@@ -42,21 +45,34 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
+
+    GENDER_OPTIONS = (
+        ("f", "Женский"),
+        ("m", "Мужской"),
+        ("n", "Не указан"),
+    )
+
     email = models.EmailField(_("email"), max_length=255, unique=True, blank=True)
-    username = models.CharField(_("username"), max_length=255, unique=True)
-    first_name = models.CharField(_("first_name"), max_length=255, blank=True)
-    last_name = models.CharField(_("last_name"), max_length=255, blank=True)
-    avatar_url = models.URLField(_("photo"), blank=True)
+    username = models.CharField(_("username"), max_length=15, unique=True)
+    first_name = models.CharField(_("first_name"), max_length=50, blank=True)
+    last_name = models.CharField(_("last_name"), max_length=50, blank=True)
+    gender = models.CharField(max_length=1, choices=GENDER_OPTIONS, default="n")
+    avatar_url = models.URLField(_("photo"), default="", blank=True)
+    bio = models.TextField(_("biography"), max_length=500, blank=True)
+    rating = models.FloatField(default=0)
     registration_date = models.DateTimeField(_("registration"), auto_now_add=True)
     last_login = models.DateTimeField(_("last_login"), auto_now=True)
-    bio = models.TextField(_("biography"), blank=True, max_length=500)
 
-    birthdate_year = models.IntegerField(
-        _("year_of_birth"),
-        validators=[MaxValueValidator(2050), MinValueValidator(1900)],
-        default=1900,
+    birthdate_year = models.DateField(
+        _("date_of_birth"),
+        validators=[MaxValueValidator(current_year), MinValueValidator(1900)],
         blank=True,
+        null=True,
     )
+
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    is_verified = models.BooleanField(default=False)
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["username", "email"]
@@ -69,3 +85,8 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.username
+
+    def age(self) -> int:
+        if not self.birthdate_year:
+            return 0
+        return (timezone.now().date() - self.birthdate_year).days / 365.25

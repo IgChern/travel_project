@@ -10,7 +10,7 @@ class Rating(models.Model):
     Модель рейтинга: Лайк - Дизлайк для постов
     """
 
-    VOTE_CHOICES = ((1, "Like"), (2, "Dislike"))
+    VOTE_CHOICES = ((1, "Like"), (-1, "Dislike"))
 
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="ratings")
     user = models.ForeignKey(
@@ -18,6 +18,7 @@ class Rating(models.Model):
         on_delete=models.CASCADE,
         blank=True,
         null=True,
+        related_name="user_ratings",
     )
     value = models.IntegerField(_("Value"), choices=VOTE_CHOICES)
     time_create = models.DateTimeField(_("Created"), auto_now_add=True)
@@ -33,11 +34,12 @@ class Rating(models.Model):
 
 
 class Comment(models.Model):
-    """
-    Модель древовидных комментариев
-    """
 
-    STATUS_OPTIONS = (("published", "Опубликовано"), ("draft", "Черновик"))
+    STATUS_OPTIONS = (
+        ("published", "Опубликовано"),
+        ("draft", "Черновик"),
+        ("deleted", "Удален"),
+    )
 
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
     author = models.ForeignKey(

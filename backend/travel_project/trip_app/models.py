@@ -49,6 +49,7 @@ class Post(models.Model):
     )
     place_name = models.CharField(_("Place_name"), max_length=255)
     place_type = models.CharField(_("Place_type"), max_length=255, blank=True)
+    rating = models.FloatField(default=0)
     description = models.TextField(_("Description"), blank=True)
     photo = models.URLField(_("Photo"), blank=True)
 

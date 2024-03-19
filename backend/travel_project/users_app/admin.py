@@ -5,5 +5,15 @@ from .models import User
 # Register your models here.
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    search_fields = ("username",)
-    list_display = ("username", "first_name", "last_name")
+    search_fields = ("username", "email")
+    list_display = (
+        "__str__",
+        "is_staff",
+        "is_active",
+        "is_verified",
+    )
+    list_filter = (
+        "is_staff",
+        "is_active",
+        "is_verified",
+    )
