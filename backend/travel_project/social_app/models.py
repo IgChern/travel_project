@@ -3,15 +3,11 @@ from users_app.models import User
 from trip_app.models import Post
 from django.utils.translation import gettext_lazy as _
 from mptt.models import MPTTModel, TreeForeignKey
+from .choices import CommentStatus, CommentVoteChoice
 
 
 # Create your models here.
-class Rating(models.Model):
-    """
-    Модель рейтинга: Лайк - Дизлайк для постов
-    """
-
-    VOTE_CHOICES = ((1, "Like"), (-1, "Dislike"), (0, "Not Rated"))
+class CommentRating(models.Model):
 
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="ratings")
     author = models.ForeignKey(
@@ -21,7 +17,7 @@ class Rating(models.Model):
         null=True,
         related_name="user_ratings",
     )
-    value = models.IntegerField(_("Value"), choices=VOTE_CHOICES)
+    value = models.SmallIntegerField(_("Value"), choices=CommentVoteChoice.choices)
     time_create = models.DateTimeField(_("Created"), auto_now_add=True)
 
     class Meta:
@@ -37,11 +33,6 @@ class Rating(models.Model):
 
 class Comment(MPTTModel):
 
-    STATUS_OPTIONS = (
-        ("published", "Опубликовано"),
-        ("deleted", "Удален"),
-    )
-
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
     author = models.ForeignKey(
         User,
@@ -54,9 +45,9 @@ class Comment(MPTTModel):
     time_create = models.DateTimeField(_("Time_create"), auto_now_add=True)
     time_update = models.DateTimeField(_("Time_update"), auto_now=True)
     status = models.CharField(
-        choices=STATUS_OPTIONS,
-        default="published",
-        max_length=10,
+        choices=CommentStatus.choices,
+        default=CommentStatus.PUBLISHED,
+        max_length=9,
     )
 
     parent = TreeForeignKey(

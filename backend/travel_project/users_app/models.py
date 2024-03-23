@@ -58,13 +58,17 @@ class User(AbstractBaseUser):
     gender = models.CharField(
         max_length=1, choices=GENDER_OPTIONS, default="n", blank=True
     )
-    slug = models.SlugField(_("URL"), max_length=255, blank=True)
+    slug = models.SlugField(_("URL"), max_length=255, default="", blank=True)
 
     avatar_url = models.URLField(_("photo"), default="", blank=True)
     bio = models.TextField(_("biography"), max_length=500, blank=True)
     rating = models.FloatField(default=0, blank=True)
     registration_date = models.DateTimeField(_("registration"), auto_now_add=True)
     last_login = models.DateTimeField(_("last_login"), auto_now=True)
+
+    comments_count = models.PositiveIntegerField(default=0)
+    votes_up_count = models.PositiveIntegerField(default=0)
+    votes_down_count = models.PositiveIntegerField(default=0)
 
     birthdate_year = models.DateField(
         _("date_of_birth"),
