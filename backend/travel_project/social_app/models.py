@@ -49,6 +49,9 @@ class Comment(MPTTModel):
         default=CommentStatus.PUBLISHED,
         max_length=9,
     )
+    votes_up_count = models.IntegerField(default=0)
+    votes_down_count = models.IntegerField(default=0)
+    rating = models.IntegerField(default=0)
 
     parent = TreeForeignKey(
         "self",
