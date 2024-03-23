@@ -5,8 +5,8 @@ from .models import Rating, Comment
 # Register your models here.
 @admin.register(Rating)
 class RatingAdmin(admin.ModelAdmin):
-    search_fields = ("post", "user", "value")
-    list_display = ("post", "user", "value")
+    search_fields = ("post", "author", "value")
+    list_display = ("post", "author", "value")
 
 
 @admin.register(Comment)

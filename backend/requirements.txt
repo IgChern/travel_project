@@ -1,6 +1,9 @@
-Django==4.0.0
+Django==4.2.7
 psycopg2==2.9.9
 python-dotenv==1.0.0
 djangorestframework==3.14.0
 tzdata==2023.3
 cffi==1.16.0
+django-mptt==0.15.0
+django-mptt-admin==2.5.1
+Pillow==10.1.0

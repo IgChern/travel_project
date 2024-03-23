@@ -6,8 +6,8 @@ from .models import Post, Trips
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    search_fields = ("place_name", "create")
-    list_display = ("place_name", "create", "author_id")
+    search_fields = ("title", "create")
+    list_display = ("title", "create", "author_id", "rating")
 
 
 @admin.register(Trips)

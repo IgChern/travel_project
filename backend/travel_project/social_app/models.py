@@ -2,6 +2,7 @@ from django.db import models
 from users_app.models import User
 from trip_app.models import Post
 from django.utils.translation import gettext_lazy as _
+from mptt.models import MPTTModel, TreeForeignKey
 
 
 # Create your models here.
@@ -10,10 +11,10 @@ class Rating(models.Model):
     Модель рейтинга: Лайк - Дизлайк для постов
     """
 
-    VOTE_CHOICES = ((1, "Like"), (-1, "Dislike"))
+    VOTE_CHOICES = ((1, "Like"), (-1, "Dislike"), (0, "Not Rated"))
 
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="ratings")
-    user = models.ForeignKey(
+    author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         blank=True,
@@ -26,18 +27,18 @@ class Rating(models.Model):
     class Meta:
         ordering = ("-time_create",)
         indexes = [models.Index(fields=["-time_create", "value"])]
+        unique_together = ("post", "author")
         verbose_name = "Rating"
         verbose_name_plural = "Ratings"
 
     def __str__(self):
-        return self.post.place_name
+        return self.post.title
 
 
-class Comment(models.Model):
+class Comment(MPTTModel):
 
     STATUS_OPTIONS = (
         ("published", "Опубликовано"),
-        ("draft", "Черновик"),
         ("deleted", "Удален"),
     )
 
@@ -46,6 +47,8 @@ class Comment(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name="comments_author",
+        blank=True,
+        null=True,
     )
     content = models.TextField(_("Comment"), max_length=3000)
     time_create = models.DateTimeField(_("Time_create"), auto_now_add=True)
@@ -55,6 +58,22 @@ class Comment(models.Model):
         default="published",
         max_length=10,
     )
+
+    parent = TreeForeignKey(
+        "self",
+        related_name="children",
+        null=True,
+        blank=True,
+        db_index=True,
+        on_delete=models.CASCADE,
+    )
+
+    class MTTMeta:
+        """
+        Сортировка по вложенности
+        """
+
+        order_insertion_by = ("-time_create",)
 
     class Meta:
         """

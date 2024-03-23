@@ -16,8 +16,6 @@ class UserManager(BaseUserManager):
     def create_user(self, username, email, password=None):
         if not username:
             raise ValueError("Users must have a username")
-        if len(password) <= 8:
-            raise ValueError("Password must be more than 8 symbols")
         if email is None:
             raise TypeError("Users must have an email address.")
 
@@ -52,14 +50,19 @@ class User(AbstractBaseUser):
         ("n", "Не указан"),
     )
 
-    email = models.EmailField(_("email"), max_length=255, unique=True, blank=True)
-    username = models.CharField(_("username"), max_length=15, unique=True)
+    email = models.EmailField(_("email"), max_length=255, unique=True)
+    login = models.CharField(_("username"), max_length=15, unique=True)
+
     first_name = models.CharField(_("first_name"), max_length=50, blank=True)
     last_name = models.CharField(_("last_name"), max_length=50, blank=True)
-    gender = models.CharField(max_length=1, choices=GENDER_OPTIONS, default="n")
+    gender = models.CharField(
+        max_length=1, choices=GENDER_OPTIONS, default="n", blank=True
+    )
+    slug = models.SlugField(_("URL"), max_length=255, blank=True)
+
     avatar_url = models.URLField(_("photo"), default="", blank=True)
     bio = models.TextField(_("biography"), max_length=500, blank=True)
-    rating = models.FloatField(default=0)
+    rating = models.FloatField(default=0, blank=True)
     registration_date = models.DateTimeField(_("registration"), auto_now_add=True)
     last_login = models.DateTimeField(_("last_login"), auto_now=True)
 
@@ -74,8 +77,8 @@ class User(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_verified = models.BooleanField(default=False)
 
-    USERNAME_FIELD = "username"
-    REQUIRED_FIELDS = ["username", "email"]
+    USERNAME_FIELD = "login"
+    REQUIRED_FIELDS = ["login", "email"]
 
     objects = UserManager()
 
@@ -84,7 +87,7 @@ class User(AbstractBaseUser):
         verbose_name_plural = "Users"
 
     def __str__(self):
-        return self.username
+        return self.login
 
     def age(self) -> int:
         if not self.birthdate_year:

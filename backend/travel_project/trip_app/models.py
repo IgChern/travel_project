@@ -17,11 +17,9 @@ class PostManager(models.Manager):
 
 # Create your models here.
 class Trips(models.Model):
-    user_id = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="user_trip"
-    )
-    location = models.CharField(_("Location"), max_length=255)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_trip")
     title = models.CharField(_("Title"), max_length=255, blank=True)
+    location = models.CharField(_("Location"), max_length=255)
     description = models.TextField(_("Description"), blank=True)
     start_date = models.DateTimeField(_("Start_date"))
     end_date = models.DateTimeField(_("End_date"))
@@ -43,13 +41,13 @@ class Post(models.Model):
         User, on_delete=models.SET_DEFAULT, related_name="author_posts", default=1
     )
     trip = models.ForeignKey(Trips, on_delete=models.CASCADE, related_name="user_trip")
+    title = models.CharField(_("Название поста"), max_length=255)
+
     slug = models.SlugField(_("URL"), max_length=255, blank=True)
     status = models.CharField(
         _("status"), choices=STATUS_OPTIONS, default="published", max_length=10
     )
-    place_name = models.CharField(_("Place_name"), max_length=255)
-    place_type = models.CharField(_("Place_type"), max_length=255, blank=True)
-    rating = models.FloatField(default=0)
+    rating = models.FloatField(default=0, blank=True)
     description = models.TextField(_("Description"), blank=True)
     photo = models.URLField(_("Photo"), blank=True)
 
@@ -64,4 +62,4 @@ class Post(models.Model):
         verbose_name_plural = "Posts"
 
     def __str__(self) -> str:
-        return self.place_name
+        return self.title
